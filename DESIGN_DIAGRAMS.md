@@ -86,6 +86,7 @@ graph TB
 
 ```mermaid
 classDiagram
+    direction LR
     class User {
         +int id
         +string email
