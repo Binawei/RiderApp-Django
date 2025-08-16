@@ -92,127 +92,98 @@ classDiagram
         +string first_name
         +string last_name
         +string phone
-        +string password
         +register()
         +login()
-        +update_profile()
     }
     
     class Passenger {
         +int id
         +decimal wallet_balance
-        +User user
         +request_ride()
         +make_payment()
         +rate_driver()
-        +fund_wallet()
     }
     
     class Driver {
         +int id
         +string license_plate
         +string vehicle_make
-        +string vehicle_model
         +decimal earnings
-        +User user
         +accept_ride()
         +start_ride()
         +complete_ride()
-        +update_location()
     }
     
     class Ride {
         +int id
-        +Passenger passenger
-        +Driver driver
-        +Location pickup_location
-        +Location dropoff_location
         +decimal fare
         +string status
         +string ride_type
         +float distance
         +int rating
-        +datetime request_time
     }
     
     class Payment {
         +int id
-        +Ride ride
         +decimal amount
         +string method
         +string status
-        +string stripe_payment_id
         +process_payment()
     }
     
-    class Location {
-        +int id
-        +float latitude
-        +float longitude
-        +string address
-        +string postcode
-    }
-    
     class RideManagementSystem {
-        <<Singleton>>
-        -RideManagementSystem instance
         +create_ride()
         +match_driver()
         +calculate_fare()
-        +get_instance()
     }
     
-    class FareStrategy {
-        <<interface>>
-        +calculate_fare(distance, ride_type)
-    }
-    
-    class StandardFareStrategy {
-        +calculate_fare(distance, ride_type)
-    }
-    
-    class PoolFareStrategy {
-        +calculate_fare(distance, ride_type)
-    }
-    
-    class LuxuryFareStrategy {
-        +calculate_fare(distance, ride_type)
-    }
-    
-    class PaymentFactory {
-        <<Factory>>
-        +create_payment(type, amount)
-    }
-    
-    class RideObserver {
-        <<interface>>
-        +update(ride, event_type)
-    }
-    
-    class DriverNotificationObserver {
-        +update(ride, event_type)
-    }
-    
-    class PassengerNotificationObserver {
-        +update(ride, event_type)
-    }
-    
-    User ||--|| Passenger
-    User ||--|| Driver
-    Passenger ||--o{ Ride
-    Driver ||--o{ Ride
-    Ride ||--|| Payment
-    Ride }o--|| Location
-    
-    FareStrategy <|-- StandardFareStrategy
-    FareStrategy <|-- PoolFareStrategy
-    FareStrategy <|-- LuxuryFareStrategy
-    
-    RideObserver <|-- DriverNotificationObserver
-    RideObserver <|-- PassengerNotificationObserver
+    User --> Passenger
+    User --> Driver
+    Passenger --> Ride
+    Driver --> Ride
+    Ride --> Payment
 ```
 
-### 3. Entity Relationship Diagram (ERD)
+### 3. Design Patterns Implementation
+
+```mermaid
+graph TB
+    subgraph "Singleton Pattern"
+        RMS["RideManagementSystem"]
+        RMS_DESC["Single instance manages all rides"]
+    end
+    
+    subgraph "Strategy Pattern"
+        FS["FareStrategy"]
+        SFS["StandardFare"]
+        PFS["PoolFare"]
+        LFS["LuxuryFare"]
+    end
+    
+    subgraph "Factory Pattern"
+        PF["PaymentFactory"]
+        SPP["StripePayment"]
+        WPP["WalletPayment"]
+    end
+    
+    subgraph "Observer Pattern"
+        RS["RideSubject"]
+        DNO["DriverObserver"]
+        PNO["PassengerObserver"]
+    end
+    
+    FS --> SFS
+    FS --> PFS
+    FS --> LFS
+    
+    PF --> SPP
+    PF --> WPP
+    
+    RS --> DNO
+    RS --> PNO
+```
+
+### 4. Entity Relationship Diagram (ERD)
 
 ```mermaid
 erDiagram
@@ -298,48 +269,7 @@ erDiagram
     RIDE }o--|| LOCATION : "dropoff"
 ```
 
-### 4. Design Patterns Architecture
 
-```mermaid
-graph TB
-    subgraph "Singleton Pattern"
-        RMS["🔄 RideManagementSystem"]
-        RMS_DESC["Ensures single instance<br/>Global access point<br/>Manages all ride operations"]
-        RMS --> RMS_DESC
-    end
-    
-    subgraph "Strategy Pattern"
-        FS["💰 FareStrategy"]
-        SFS["StandardFareStrategy"]
-        PFS["PoolFareStrategy"]
-        LFS["LuxuryFareStrategy"]
-        FS --> SFS
-        FS --> PFS
-        FS --> LFS
-    end
-    
-    subgraph "Factory Pattern"
-        PF["🏭 PaymentFactory"]
-        SPP["StripePaymentProcessor"]
-        WPP["WalletPaymentProcessor"]
-        CPP["CashPaymentProcessor"]
-        PF --> SPP
-        PF --> WPP
-        PF --> CPP
-    end
-    
-    subgraph "Observer Pattern"
-        RS["📢 RideSubject"]
-        DNO["DriverNotificationObserver"]
-        PNO["PassengerNotificationObserver"]
-        RS --> DNO
-        RS --> PNO
-    end
-    
-    RMS -.-> FS
-    RMS -.-> PF
-    RMS -.-> RS
-```
 
 ## Design Pattern Implementation Details
 
