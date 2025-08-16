@@ -197,13 +197,12 @@ classDiagram
         +update(ride, event_type)
     }
     
-    User ||--|| Passenger : "1:1"
-    User ||--|| Driver : "1:1"
-    Passenger ||--o{ Ride : "1:M"
-    Driver ||--o{ Ride : "1:M"
-    Ride ||--|| Payment : "1:1"
-    Ride }o--|| Location : "pickup"
-    Ride }o--|| Location : "dropoff"
+    User ||--|| Passenger
+    User ||--|| Driver
+    Passenger ||--o{ Ride
+    Driver ||--o{ Ride
+    Ride ||--|| Payment
+    Ride }o--|| Location
     
     FareStrategy <|-- StandardFareStrategy
     FareStrategy <|-- PoolFareStrategy
